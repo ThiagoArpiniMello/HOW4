@@ -4,20 +4,26 @@
  * and open the template in the editor.
  */
 package deliverycervejas;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author thiag
  */
 public class MenuCervejas extends javax.swing.JFrame {
-
+    HashMap usuarioMap;
     /**
      * Creates new form tela3
      */
     public MenuCervejas() {
         initComponents();
     }
-
+    
+    public MenuCervejas (HashMap map) {
+        initComponents();
+        this.usuarioMap = map; 
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -444,7 +450,32 @@ public class MenuCervejas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void adicionarCervejaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adicionarCervejaActionPerformed
-        Pagamento pagamento = new Pagamento();
+        int duvelNome = (int) duvel.getValue();
+        int paulanerNome = (int) paulaner.getValue();
+        int guinnessNome = (int) guinness.getValue();
+        int guinnessExtraNome = (int) guinnessExtraStout.getValue();
+        int erdingerNome = (int) erdinger.getValue();
+        int punkIpaNome = (int) punkIpa.getValue();
+        int samuelAdamsNome = (int) samuelAdams.getValue();
+        int laTrappeNome = (int) laTrappe.getValue();
+
+        Map map = new HashMap();
+        // Put elements to the map
+        map.put("duvel", duvelNome);
+        map.put("paulaner", paulanerNome);
+        map.put("guinness", guinnessNome);
+        map.put("guinnessExtraStout", guinnessExtraNome);
+        map.put("erdinger",erdingerNome);
+        map.put("punkIpa",punkIpaNome);
+        map.put("samuelAdams",samuelAdamsNome);
+        map.put("laTrappe",laTrappeNome);
+        map.put("usuario",this.usuarioMap.get("usuario"));
+        map.put("nome",this.usuarioMap.get("nome"));
+        map.put("id",this.usuarioMap.get("id"));
+        
+        
+
+        Pagamento pagamento = new Pagamento((HashMap) map);
         pagamento.setVisible(true);
         
     }//GEN-LAST:event_adicionarCervejaActionPerformed

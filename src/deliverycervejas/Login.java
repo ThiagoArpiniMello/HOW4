@@ -4,13 +4,29 @@
  * and open the template in the editor.
  */
 package deliverycervejas;
+import java.util.List;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author thiag
  */
 public class Login extends javax.swing.JFrame {
-
+    Conexao conexao = new Conexao();
+    Connection conn;
+    PreparedStatement ps;
+    Statement s;
+    ResultSet rs;
     /**
      * Creates new form tela2
      */
@@ -55,6 +71,11 @@ public class Login extends javax.swing.JFrame {
         jLabel2.setBounds(130, 290, 113, 52);
 
         login.setBackground(new java.awt.Color(102, 153, 0));
+        login.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginActionPerformed(evt);
+            }
+        });
         jPanel1.add(login);
         login.setBounds(240, 180, 430, 70);
 
@@ -117,9 +138,45 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void entrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_entrarActionPerformed
-        MenuCervejas menucervejas = new MenuCervejas();
-        menucervejas.setVisible(true);
-        this.setVisible(false);
+        String sql = "SELECT * FROM usuario WHERE login = ?;";
+        String usuario =login.getText();
+        String senhaDigitada = String.valueOf(senha.getPassword());
+        String senhaUsuario = "";
+        String nome = "";
+        int id = 0;
+        
+             
+        try {
+            conn = conexao.getConexao();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, usuario); 
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                senhaUsuario = rs.getString("senha"); 
+                nome = rs.getString("nome"); 
+                id =  rs.getInt("id"); 
+            }
+            
+            if    (senhaUsuario.equals(senhaDigitada)){
+                   Map map = new HashMap();
+        // Put elements to the map
+                 map.put("usuario", usuario);
+                 map.put("nome", nome);
+                 map.put("id", id);
+             
+                  MenuCervejas menucervejas = new MenuCervejas((HashMap) map);
+                  menucervejas.setVisible(true);
+                  this.setVisible(false);
+            }else {
+                JOptionPane.showMessageDialog(this, "Não foi possivel encontrar seu usuário, tente novamente.");
+            }
+
+            conn.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }//GEN-LAST:event_entrarActionPerformed
 
@@ -128,6 +185,10 @@ public class Login extends javax.swing.JFrame {
         cadastrousuarios.setVisible(true);
         
     }//GEN-LAST:event_criarContaActionPerformed
+
+    private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_loginActionPerformed
 
     /**
      * @param args the command line arguments

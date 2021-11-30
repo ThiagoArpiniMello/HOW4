@@ -5,7 +5,14 @@
  */
 package deliverycervejas;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import java.sql.PreparedStatement;
+import java.util.Arrays;
+
 
 /**
  *
@@ -50,7 +57,7 @@ public class CadastroUsuarios extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        ufUsuario = new javax.swing.JComboBox<>();
         numeroUsuario = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         emailUsuario = new javax.swing.JTextField();
@@ -60,7 +67,7 @@ public class CadastroUsuarios extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         imagembeer = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        dataUsuario = new javax.swing.JFormattedTextField();
         senhaUsuario = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -157,11 +164,11 @@ public class CadastroUsuarios extends javax.swing.JFrame {
         jPanel2.add(jLabel12);
         jLabel12.setBounds(80, 300, 50, 30);
 
-        jComboBox1.setBackground(new java.awt.Color(51, 102, 0));
-        jComboBox1.setEditable(true);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal", "Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul", "Minas Gerais", "Pará", "Paraíba", "Paraná", "Pernambuco", "Piauí", "Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia", "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins", " " }));
-        jPanel2.add(jComboBox1);
-        jComboBox1.setBounds(750, 240, 70, 40);
+        ufUsuario.setBackground(new java.awt.Color(51, 102, 0));
+        ufUsuario.setEditable(true);
+        ufUsuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AC", "AL", "AP", "AM", "BA", "CE", " DF", "ES", "GO", "MA", "MT", "MS", " MG", " PA", " PB", " PR", " PE", " PI", " RJ", " RN", " RS", "RO", "RR", "SC", "SP", "SE", "TO" }));
+        jPanel2.add(ufUsuario);
+        ufUsuario.setBounds(750, 240, 70, 40);
 
         numeroUsuario.setBackground(new java.awt.Color(51, 102, 0));
         jPanel2.add(numeroUsuario);
@@ -214,9 +221,9 @@ public class CadastroUsuarios extends javax.swing.JFrame {
         jPanel2.add(imagembeer);
         imagembeer.setBounds(740, 330, 140, 170);
 
-        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT))));
-        jPanel2.add(jFormattedTextField1);
-        jFormattedTextField1.setBounds(710, 110, 110, 40);
+        dataUsuario.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT))));
+        jPanel2.add(dataUsuario);
+        dataUsuario.setBounds(710, 110, 110, 40);
 
         senhaUsuario.setBackground(new java.awt.Color(51, 102, 0));
         jPanel2.add(senhaUsuario);
@@ -237,14 +244,60 @@ public class CadastroUsuarios extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cadastrarActionPerformed
-        JOptionPane.showMessageDialog(this, "Cadastro efetuado com sucesso.");
-        this.setVisible(false); 
+        String email = this.emailUsuario.getText();
+        String nome = this.nomeUsuario.getText();
+        String cpf = this.cpfUsuario.getText();
+        String rg = this.rgUsuario.getText();
+        String endereco = this.enderecoUsuario.getText();
+        String numero = this.numeroUsuario.getText();
+        String cep = this.cepUsuario.getText();
+        String cidade = this.cidadeUsuario.getText();
+        String uf = this.ufUsuario.getSelectedItem().toString();
+        String telefone = this.telefoneUsuario.getText();
+        String login = this.loginUsuario.getText();
+        String senha = String.valueOf(this.senhaUsuario.getPassword());
+        String data = this.dataUsuario.getText();
+
+        Conexao conexao = new Conexao();
+        try {
+            Connection con = conexao.getConexao();
+            String sql = "INSERT INTO usuario (nome,nascimento,cpf,rg,endereco,numero,cep,cidade,uf,email,telefone,login,senha)"
+                    + " VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, nome);
+            statement.setString(2, data);
+            statement.setString(3, cpf);
+            statement.setString(4, rg);
+            statement.setString(5, endereco);
+            statement.setString(6,numero);
+            statement.setString(7,cep);
+            statement.setString(8,cidade);
+            statement.setString(9,uf);
+            statement.setString(10,email);
+            statement.setString(11,telefone);
+            statement.setString(12,login);
+            statement.setString(13,senha);
+                   
+
+            int rowsInserted = statement.executeUpdate();
+            con.close();
+            if (rowsInserted > 0) {
+              JOptionPane.showMessageDialog(this, "Cadastro efetuado com sucesso.");
+              this.setVisible(false);
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(CadastroUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        
 
     }//GEN-LAST:event_cadastrarActionPerformed
 
     private void cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarActionPerformed
         this.setVisible(false);
-        
+
     }//GEN-LAST:event_cancelarActionPerformed
 
     /**
@@ -291,11 +344,10 @@ public class CadastroUsuarios extends javax.swing.JFrame {
     private javax.swing.JTextField cepUsuario;
     private javax.swing.JTextField cidadeUsuario;
     private javax.swing.JTextField cpfUsuario;
+    private javax.swing.JFormattedTextField dataUsuario;
     private javax.swing.JTextField emailUsuario;
     private javax.swing.JTextField enderecoUsuario;
     private javax.swing.JLabel imagembeer;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -319,5 +371,6 @@ public class CadastroUsuarios extends javax.swing.JFrame {
     private javax.swing.JTextField rgUsuario;
     private javax.swing.JPasswordField senhaUsuario;
     private javax.swing.JTextField telefoneUsuario;
+    private javax.swing.JComboBox<String> ufUsuario;
     // End of variables declaration//GEN-END:variables
 }

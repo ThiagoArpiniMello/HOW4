@@ -4,22 +4,98 @@
  * and open the template in the editor.
  */
 package deliverycervejas;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author thiag
  */
 public class Pagamento extends javax.swing.JFrame {
-
+    int duvelQtd = 0;
+    int guinnessQtd = 0;
+    int guinnessExtraStoutQtd = 0;
+    int paulanerQtd = 0;
+    int laTrappeQtd = 0;
+    int erdingerQtd = 0;
+    int samuelAdamsQtd = 0;
+    int punkIpaQtd = 0;
+    String usuario ="";
+    String nome = "";
+    int id = 0;
+    
+     private DefaultTableModel grid = new DefaultTableModel();
+    
     /**
      * Creates new form tela4
      */
     public Pagamento() {
         initComponents();
     }
-
+    
+    public Pagamento(HashMap map) {
+        
+        initComponents();
+        double totalPagamento = 0;
+        this.gridClean();
+        duvelQtd = (int) map.get("duvel");
+        guinnessQtd = (int) map.get("guinness");
+        guinnessExtraStoutQtd = (int) map.get("guinnessExtraStout");
+        paulanerQtd = (int) map.get("paulaner");
+        laTrappeQtd = (int) map.get ("laTrappe");
+        erdingerQtd = (int) map.get("erdinger");
+        samuelAdamsQtd = (int) map.get("samuelAdams");
+        punkIpaQtd = (int) map.get("punkIpa");
+        usuario =  (String) map.get("usuario");
+        nome =  (String) map.get("nome");
+        id = (int) map.get("id");
+        
+        pagamentoCliente.setText(nome);
+        
+        
+        this.grid = (DefaultTableModel) gridCervejas.getModel();
+        
+        if(duvelQtd > 0){
+            totalPagamento +=adicionarNoGrid("duvel", duvelQtd, 20.99);       
+        }
+        if(guinnessQtd > 0){
+            totalPagamento +=adicionarNoGrid("guinness", guinnessQtd, 17.90);       
+        }
+        if(guinnessExtraStoutQtd > 0){
+            totalPagamento +=adicionarNoGrid("guinnessExtraStout", guinnessExtraStoutQtd, 45.00);       
+        }
+        if(erdingerQtd > 0){
+            totalPagamento +=adicionarNoGrid("erdinger", erdingerQtd, 21.90);       
+        }
+         if(laTrappeQtd > 0){
+            totalPagamento +=adicionarNoGrid("laTrappe", laTrappeQtd, 31.90);       
+        }
+        if(punkIpaQtd > 0){
+            totalPagamento +=adicionarNoGrid("punkIpa", punkIpaQtd, 18.99);       
+        }
+        if(samuelAdamsQtd > 0){
+            totalPagamento +=adicionarNoGrid("samuelAdams", samuelAdamsQtd, 17.90);       
+        }
+          if(paulanerQtd > 0){
+            totalPagamento +=adicionarNoGrid("paulaner", paulanerQtd, 19.99);       
+        }
+          pagamentoTotal.setText(String.valueOf(totalPagamento));
+    }
+    private void gridClean() {
+        int rows = this.grid.getRowCount();
+        for (int i = rows - 1; i >= 0; i--) {
+            this.grid.removeRow(i);
+        }
+    }
+        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,14 +107,14 @@ public class Pagamento extends javax.swing.JFrame {
 
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        gridCervejas = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        pagamentoCliente = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jTextField2 = new javax.swing.JTextField();
+        pagamentoDinheiro = new javax.swing.JRadioButton();
+        pagamentoCredito = new javax.swing.JRadioButton();
+        pagamentoDebito = new javax.swing.JRadioButton();
+        pagamentoTotal = new javax.swing.JTextField();
         button2 = new java.awt.Button();
         button4 = new java.awt.Button();
         button3 = new java.awt.Button();
@@ -51,11 +127,9 @@ public class Pagamento extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
         jPanel2.setLayout(null);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        gridCervejas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"", "", "", null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Cerveja", "Quantidade", "Valor", "Total"
@@ -69,7 +143,7 @@ public class Pagamento extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(gridCervejas);
 
         jPanel2.add(jScrollPane1);
         jScrollPane1.setBounds(21, 103, 889, 100);
@@ -80,10 +154,15 @@ public class Pagamento extends javax.swing.JFrame {
         jPanel2.add(jLabel2);
         jLabel2.setBounds(30, 40, 100, 29);
 
-        jTextField1.setEditable(false);
-        jTextField1.setBackground(new java.awt.Color(51, 102, 0));
-        jPanel2.add(jTextField1);
-        jTextField1.setBounds(130, 39, 340, 40);
+        pagamentoCliente.setEditable(false);
+        pagamentoCliente.setBackground(new java.awt.Color(51, 102, 0));
+        pagamentoCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pagamentoClienteActionPerformed(evt);
+            }
+        });
+        jPanel2.add(pagamentoCliente);
+        pagamentoCliente.setBounds(130, 39, 340, 40);
 
         jLabel3.setBackground(new java.awt.Color(51, 102, 0));
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
@@ -92,28 +171,33 @@ public class Pagamento extends javax.swing.JFrame {
         jPanel2.add(jLabel3);
         jLabel3.setBounds(480, 280, 190, 40);
 
-        jRadioButton1.setBackground(new java.awt.Color(218, 218, 35));
-        jRadioButton1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Dinnheiro");
-        jPanel2.add(jRadioButton1);
-        jRadioButton1.setBounds(20, 400, 100, 30);
+        pagamentoDinheiro.setBackground(new java.awt.Color(218, 218, 35));
+        pagamentoDinheiro.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        pagamentoDinheiro.setSelected(true);
+        pagamentoDinheiro.setText("Dinnheiro");
+        jPanel2.add(pagamentoDinheiro);
+        pagamentoDinheiro.setBounds(20, 400, 100, 30);
 
-        jRadioButton2.setBackground(new java.awt.Color(218, 218, 35));
-        jRadioButton2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jRadioButton2.setText("Credito");
-        jPanel2.add(jRadioButton2);
-        jRadioButton2.setBounds(150, 400, 80, 30);
+        pagamentoCredito.setBackground(new java.awt.Color(218, 218, 35));
+        pagamentoCredito.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        pagamentoCredito.setText("Credito");
+        jPanel2.add(pagamentoCredito);
+        pagamentoCredito.setBounds(150, 400, 80, 30);
 
-        jRadioButton3.setBackground(new java.awt.Color(218, 218, 35));
-        jRadioButton3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jRadioButton3.setText("Debito");
-        jPanel2.add(jRadioButton3);
-        jRadioButton3.setBounds(260, 400, 80, 30);
+        pagamentoDebito.setBackground(new java.awt.Color(218, 218, 35));
+        pagamentoDebito.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        pagamentoDebito.setText("Debito");
+        jPanel2.add(pagamentoDebito);
+        pagamentoDebito.setBounds(260, 400, 80, 30);
 
-        jTextField2.setBackground(new java.awt.Color(51, 102, 0));
-        jPanel2.add(jTextField2);
-        jTextField2.setBounds(683, 274, 221, 59);
+        pagamentoTotal.setBackground(new java.awt.Color(51, 102, 0));
+        pagamentoTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pagamentoTotalActionPerformed(evt);
+            }
+        });
+        jPanel2.add(pagamentoTotal);
+        pagamentoTotal.setBounds(680, 270, 221, 59);
 
         button2.setBackground(new java.awt.Color(218, 218, 35));
         button2.setLabel("Finalizar Compra");
@@ -151,19 +235,81 @@ public class Pagamento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+        private double adicionarNoGrid(String nomeCerveja, int quantidade, double valor){
+            Object[] fields = new Object[4];
+            double total = quantidade*valor;
+                fields[0] = nomeCerveja;
+                fields[1] = quantidade;
+                fields[2] = valor;
+                fields[3] = total;
+                this.grid.addRow(fields);
+                return total;
+                
+        }
     private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
         this.setVisible(false);
     }//GEN-LAST:event_button3ActionPerformed
 
     private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
-        JOptionPane.showMessageDialog(this, "Compra efetuada com sucesso ,volte sempre.");
-        this.setVisible(false);
+        String cliente = this.pagamentoCliente.getText();
+        String totalCompra = this.pagamentoTotal.getText();
+        boolean dinheiro = this.pagamentoDinheiro.isSelected();
+        boolean credito = this.pagamentoCredito.isSelected();
+        boolean debito = this.pagamentoDebito.isSelected();
+        int tipoPagamento = 1;
+        
+        if(dinheiro){
+            tipoPagamento = 1 ;
+        }
+        
+        if(credito) {
+            tipoPagamento = 2 ;
+        }
+        
+        if(debito){
+            tipoPagamento = 3;
+        }
+        Conexao conexao = new Conexao();
+        try {
+            Connection con = conexao.getConexao();
+            String sql = "INSERT INTO pagamento (id_cliente,id_tipo_pagamento ,pagamentoTotal)"
+                    + " VALUES ( ?, ? ,?)";
+
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setInt(1, this.id);
+            statement.setInt(2,tipoPagamento);
+            statement.setString(3, totalCompra);
+            
+                   
+
+            int rowsInserted = statement.executeUpdate();
+            con.close();
+            
+            if (rowsInserted > 0) {
+               JOptionPane.showMessageDialog(this, "Compra efetuada com sucesso ,volte sempre.");
+              this.setVisible(false);
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(CadastroUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        
 
     }//GEN-LAST:event_button2ActionPerformed
 
     private void button4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_button4ActionPerformed
+
+    private void pagamentoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pagamentoClienteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pagamentoClienteActionPerformed
+
+    private void pagamentoTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pagamentoTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pagamentoTotalActionPerformed
 
     /**
      * @param args the command line arguments
@@ -205,15 +351,15 @@ public class Pagamento extends javax.swing.JFrame {
     private java.awt.Button button2;
     private java.awt.Button button3;
     private java.awt.Button button4;
+    private javax.swing.JTable gridCervejas;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField pagamentoCliente;
+    private javax.swing.JRadioButton pagamentoCredito;
+    private javax.swing.JRadioButton pagamentoDebito;
+    private javax.swing.JRadioButton pagamentoDinheiro;
+    private javax.swing.JTextField pagamentoTotal;
     // End of variables declaration//GEN-END:variables
 }
